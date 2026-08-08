@@ -24,20 +24,6 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-    <!-- News -->
-    <section>
-      <div class="flex items-center justify-between mb-3 gap-2">
-        <h2 class="text-lg font-semibold text-emerald-900 flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> In the News
-        </h2>
-        <button id="refreshNews" class="text-xs text-emerald-700 hover:underline">Refresh</button>
-      </div>
-      <div id="newsGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <p class="text-sm text-slate-500 col-span-full">Loading latest from FlamboroughToday…</p>
-      </div>
-      <p class="text-xs text-slate-500 mt-3">Live via FlamboroughToday RSS · <a href="https://www.flamboroughtoday.com/local-news" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">More local news →</a></p>
-    </section>
-
     <!-- Construction -->
     <section>
       <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
@@ -71,7 +57,7 @@
       <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-sky-500"></span> Quick Reference
       </h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <a href="https://www.hamilton.ca/home-neighbourhood/garbage-recycling" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
           <p class="font-medium text-slate-900">Garbage &amp; Recycling</p>
           <p class="text-sm text-slate-600 mt-1">Collection schedule, green bin, bulk items</p>
@@ -87,6 +73,10 @@
         <a href="https://www.hamilton.ca/home-neighbourhood/garbage-recycling" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
           <p class="font-medium text-slate-900">Waste App / Schedule</p>
           <p class="text-sm text-slate-600 mt-1">Recycle Coach &amp; collection days</p>
+        </a>
+        <a href="https://www.hamilton.ca/city-council/council-committee/city-council-members/city-councillors/ward-15" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
+          <p class="font-medium text-slate-900">Ward 15 Info</p>
+          <p class="text-sm text-slate-600 mt-1">The Flamborough Waterdown city council ward</p>
         </a>
       </div>
     </section>
@@ -113,6 +103,20 @@
           <p class="text-xs text-slate-500">Demo numbers from public HPS annual reports. Wire live stats next iteration.</p>
         </div>
       </div>
+    </section>
+
+    <!-- News (last) -->
+    <section>
+      <div class="flex items-center justify-between mb-3 gap-2">
+        <h2 class="text-lg font-semibold text-emerald-900 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> In the News
+        </h2>
+        <button id="refreshNews" class="text-xs text-emerald-700 hover:underline">Refresh</button>
+      </div>
+      <div id="newsGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <p class="text-sm text-slate-500 col-span-full">Loading latest from FlamboroughToday…</p>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">Live via FlamboroughToday RSS · <a href="https://www.flamboroughtoday.com/local-news" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">More local news →</a></p>
     </section>
   </main>
 
