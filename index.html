@@ -77,19 +77,30 @@
       <h2 class="text-lg text-emerald-900 mb-3 font-bold">Crime Data · Ward 15</h2>
       <div class="grid gap-4 lg:grid-cols-2">
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Ward 15 (Flamborough / Waterdown) — 2025</p>
-          <canvas id="crimeChart" height="200"></canvas>
-          <p class="text-xs text-slate-500 mt-2">Among the lower wards for break-ins (12th of 15). Property crime still notable for a suburban ward.</p>
+          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Ward 15 totals — 2025</p>
+          <canvas id="crimeChart" height="180"></canvas>
+          <p class="text-xs text-slate-500 mt-2">12th of 15 wards for break-ins. Property crime above the ward’s 5-year average (~433).</p>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Year over year (property crime)</p>
+          <canvas id="yoyChart" height="180"></canvas>
+          <p class="text-xs text-slate-500 mt-2">2024 ≈ 513 · 2025 ≈ 522 (+~2%). Vehicle thefts in Waterdown trended down into mid-2025.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm lg:col-span-2">
+          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Nearby wards — property crime & break-ins (2025)</p>
+          <canvas id="wardCompareChart" height="120"></canvas>
+          <p class="text-xs text-slate-500 mt-2">Comparable suburban / west-end wards. Ward 15 sits near Dundas and Glanbrook on volume; Ancaster is higher.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3 lg:col-span-2">
           <p class="text-sm text-slate-700" style="font-weight:700">Ward 15 highlights</p>
           <ul class="text-sm text-slate-600 space-y-2">
-            <li class="flex gap-2"><span class="text-rose-500">•</span> 2025: ~522 property crimes, 47 break & enters, 79 auto thefts, 57 thefts from auto.</li>
+            <li class="flex gap-2"><span class="text-rose-500">•</span> 2025: 522 property crimes, 47 break & enters, 79 auto thefts, 57 thefts from auto (HPS / compiled ward rankings).</li>
+            <li class="flex gap-2"><span class="text-rose-500">•</span> Property crime roughly flat vs 2024 (~513) but above the 5-year average (~433).</li>
             <li class="flex gap-2"><span class="text-rose-500">•</span> Waterdown vehicle thefts fell (85 in 2024 → 56 reported by mid-2025).</li>
             <li class="flex gap-2"><span class="text-rose-500">•</span> Division 3 (includes Waterdown/Flamborough) had the highest youth crime volume city-wide in 2025.</li>
           </ul>
           <a href="https://hamiltonpolice.on.ca/" class="text-sm text-emerald-700 hover:underline inline-block" target="_blank" rel="noopener">Hamilton Police reports →</a>
-          <p class="text-xs text-slate-500">Sources: HPS ward reports & public 2025 ward rankings. Not live.</p>
+          <p class="text-xs text-slate-500">Sources: HPS ward reports & public 2025 ward rankings. Annual totals; not live.</p>
         </div>
       </div>
     </section>
@@ -144,7 +155,6 @@
     const RSS_URL = 'https://www.flamboroughtoday.com/rss';
     const PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL);
 
-    // Keywords that indicate Ward 15 / Waterdown–Flamborough relevance
     const WARD15 = /\b(waterdown|flamborough|clappison|parkside|grindstone|millgrove|carlisle|rockton|freelton|greensville|dundas\s+st(?:reet)?\s*e|highway\s*6|hwy\.?\s*6|ward\s*15|alexander\s+place|harry\s+howell|braeburn)\b/i;
 
     function formatDate(d) {
@@ -199,8 +209,13 @@
     document.getElementById('refreshNews').addEventListener('click', loadNews);
     loadNews();
 
-    const ctx = document.getElementById('crimeChart');
-    new Chart(ctx, {
+    const chartOpts = {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
+    };
+
+    new Chart(document.getElementById('crimeChart'), {
       type: 'bar',
       data: {
         labels: ['Property', 'Auto theft', 'From auto', 'Break & enter'],
@@ -210,12 +225,43 @@
           backgroundColor: ['#64748b', '#e11d48', '#fb7185', '#fda4af']
         }]
       },
+      options: chartOpts
+    });
+
+    new Chart(document.getElementById('yoyChart'), {
+      type: 'bar',
+      data: {
+        labels: ['2024', '2025', '5-yr avg'],
+        datasets: [{
+          label: 'Property crime',
+          data: [513, 522, 433],
+          backgroundColor: ['#94a3b8', '#0f766e', '#cbd5e1']
+        }]
+      },
+      options: chartOpts
+    });
+
+    new Chart(document.getElementById('wardCompareChart'), {
+      type: 'bar',
+      data: {
+        labels: ['W15 Waterdown', 'W13 Dundas', 'W11 Glanbrook', 'W14 W. Mountain', 'W12 Ancaster'],
+        datasets: [
+          {
+            label: 'Property crime',
+            data: [522, 534, 452, 550, 1102],
+            backgroundColor: '#0f766e'
+          },
+          {
+            label: 'Break & enter',
+            data: [47, 66, 31, 25, 101],
+            backgroundColor: '#e11d48'
+          }
+        ]
+      },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } }
-        }
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
       }
     });
   </script>
