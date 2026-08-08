@@ -19,37 +19,23 @@
         <h1 class="text-2xl font-bold tracking-tight">Waterdown Dashboard</h1>
         <p class="text-emerald-100 text-sm">Waterdown &amp; Flamborough · Live local info</p>
       </div>
-      <p class="text-xs text-emerald-200">Updated for iteration · Static demo data</p>
+      <p class="text-xs text-emerald-200" id="lastUpdated">Live news feed</p>
     </div>
   </header>
 
   <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
     <!-- News -->
     <section>
-      <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> In the News
-      </h2>
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-xs text-slate-500 mb-1">Aug 5, 2026 · The Spec</p>
-          <h3 class="font-medium text-slate-900 mb-1">Boil water advisory lifted for Fernbrook Resort</h3>
-          <p class="text-sm text-slate-600">Advisory for Flamborough resort community rescinded after corrective actions and testing.</p>
-          <a href="https://www.thespec.com/news/hamilton-region/boil-water-advisory-lifted-for-flamborough-resort-community/article_74999eed-a958-58eb-8b72-2f6b4415d375.html" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">Read more →</a>
-        </article>
-        <article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-xs text-slate-500 mb-1">Jul 10, 2026 · The Spec</p>
-          <h3 class="font-medium text-slate-900 mb-1">Power restored after Waterdown–Flamborough storm</h3>
-          <p class="text-sm text-slate-600">Thousands without power after brief severe weather; service restored across affected area.</p>
-          <a href="https://www.thespec.com/news/hamilton-region/thousands-in-waterdown-flamborugh-without-power-after-storm/article_8d978612-5ec8-5b40-a859-dd20d44055fc.html" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">Read more →</a>
-        </article>
-        <article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-xs text-slate-500 mb-1">Local · FlamboroughToday</p>
-          <h3 class="font-medium text-slate-900 mb-1">Waterdown Farmers’ Market updates</h3>
-          <p class="text-sm text-slate-600">Market continues with weather-dependent modifications; check socials for day-of changes.</p>
-          <a href="https://www.flamboroughtoday.com/" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">FlamboroughToday →</a>
-        </article>
+      <div class="flex items-center justify-between mb-3 gap-2">
+        <h2 class="text-lg font-semibold text-emerald-900 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> In the News
+        </h2>
+        <button id="refreshNews" class="text-xs text-emerald-700 hover:underline">Refresh</button>
       </div>
-      <p class="text-xs text-slate-500 mt-3">Sources: The Hamilton Spectator, FlamboroughToday. Replace with live feed/API next.</p>
+      <div id="newsGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <p class="text-sm text-slate-500 col-span-full">Loading latest from FlamboroughToday…</p>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">Live via FlamboroughToday RSS · <a href="https://www.flamboroughtoday.com/local-news" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">More local news →</a></p>
     </section>
 
     <!-- Construction -->
@@ -131,10 +117,58 @@
   </main>
 
   <footer class="border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
-    Waterdown Dashboard · Open source · Iterate with live feeds &amp; maps
+    Waterdown Dashboard · Open source · Live news via RSS
   </footer>
 
   <script>
+    const newsGrid = document.getElementById('newsGrid');
+    const lastUpdated = document.getElementById('lastUpdated');
+    const RSS_URL = 'https://www.flamboroughtoday.com/rss';
+    const PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL);
+
+    function formatDate(d) {
+      if (!d) return '';
+      const dt = new Date(d);
+      return isNaN(dt) ? d : dt.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function stripHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      return (tmp.textContent || tmp.innerText || '').trim().slice(0, 160) + (html && html.length > 160 ? '…' : '');
+    }
+
+    async function loadNews() {
+      newsGrid.innerHTML = '<p class="text-sm text-slate-500 col-span-full">Loading latest from FlamboroughToday…</p>';
+      try {
+        const res = await fetch(PROXY);
+        const data = await res.json();
+        if (data.status !== 'ok' || !data.items || !data.items.length) {
+          throw new Error(data.message || 'No items');
+        }
+        const items = data.items.slice(0, 6);
+        newsGrid.innerHTML = items.map(item => {
+          const title = item.title || 'Untitled';
+          const link = item.link || '#';
+          const desc = stripHtml(item.description || item.content || '');
+          const date = formatDate(item.pubDate);
+          return `<article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <p class="text-xs text-slate-500 mb-1">${date} · FlamboroughToday</p>
+            <h3 class="font-medium text-slate-900 mb-1">${title}</h3>
+            <p class="text-sm text-slate-600">${desc}</p>
+            <a href="${link}" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">Read more →</a>
+          </article>`;
+        }).join('');
+        lastUpdated.textContent = 'News updated ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        newsGrid.innerHTML = `<p class="text-sm text-rose-600 col-span-full">Could not load live feed. <a href="https://www.flamboroughtoday.com/local-news" class="underline" target="_blank" rel="noopener">Open FlamboroughToday</a></p>`;
+        console.error(e);
+      }
+    }
+
+    document.getElementById('refreshNews').addEventListener('click', loadNews);
+    loadNews();
+
     const ctx = document.getElementById('crimeChart');
     new Chart(ctx, {
       type: 'bar',
