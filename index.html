@@ -14,6 +14,14 @@
     h1, h2, h3 { font-weight: 700 !important; }
     .card { transition: transform 0.15s ease, border-color 0.15s ease; }
     .card:hover { transform: translateY(-2px); }
+    .tab-btn { white-space: nowrap; }
+    .tab-btn.active {
+      color: #065f46;
+      border-bottom-color: #059669;
+      font-weight: 700;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -24,9 +32,21 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-    <!-- Community projects -->
-    <section>
+  <nav class="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm" aria-label="Dashboard sections">
+    <div class="max-w-6xl mx-auto px-2 sm:px-4">
+      <div class="flex overflow-x-auto gap-1 -mb-px" role="tablist">
+        <button type="button" role="tab" aria-selected="true" data-tab="projects" class="tab-btn active px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Projects</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="crime" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Crime</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="schools" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Schools</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="hot-topics" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Hot Topics</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="quick-ref" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Quick Reference</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Projects -->
+    <div id="panel-projects" class="tab-panel active" role="tabpanel">
       <h2 class="text-lg text-emerald-900 mb-3 font-bold">Community Projects & Construction</h2>
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <ul class="divide-y divide-slate-100">
@@ -75,10 +95,10 @@
           <a href="https://www.hamilton.ca/build-invest-grow/construction-renovation/construction-your-area" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Hamilton City Construction Hub →</a>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- Crime -->
-    <section>
+    <div id="panel-crime" class="tab-panel" role="tabpanel">
       <h2 class="text-lg text-emerald-900 mb-3 font-bold">Crime Data · Ward 15</h2>
       <div class="grid gap-4 lg:grid-cols-2">
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
@@ -108,10 +128,10 @@
           <p class="text-xs text-slate-500">Sources: HPS ward reports & public 2025 ward rankings. Annual totals; not live.</p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Community Schools -->
-    <section>
+    <!-- Schools -->
+    <div id="panel-schools" class="tab-panel" role="tabpanel">
       <h2 class="text-lg text-emerald-900 mb-3 font-bold">Community Schools</h2>
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <ul class="divide-y divide-slate-100">
@@ -220,10 +240,10 @@
           <a href="https://www.hwcdsb.ca/" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">HWCDSB →</a>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- Hot Topics -->
-    <section>
+    <div id="panel-hot-topics" class="tab-panel" role="tabpanel">
       <h2 class="text-lg text-emerald-900 mb-3 font-bold">Hot Topics</h2>
       <p class="text-sm text-slate-600 mb-4">Background on issues people are talking about. Summaries aim to present main viewpoints so you can form your own opinion. Links open in a new tab.</p>
       <div class="space-y-4">
@@ -275,10 +295,10 @@
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Quick reference -->
-    <section>
+    <!-- Quick Reference -->
+    <div id="panel-quick-ref" class="tab-panel" role="tabpanel">
       <h2 class="text-lg text-emerald-900 mb-3 font-bold">Quick Reference</h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <a href="https://www.hamilton.ca/home-neighbourhood/garbage-recycling" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
@@ -306,69 +326,86 @@
           <p class="text-sm text-slate-600 mt-1">Interactive census and demographic maps for Ward 15</p>
         </a>
       </div>
-    </section>
+    </div>
   </main>
 
-  <footer class="border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+  <footer class="border-t border-slate-200 mt-8 py-6 text-center text-xs text-slate-500">
     Waterdown Dashboard · Open source
   </footer>
 
   <script>
+    // Tabs
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    function showTab(id) {
+      tabs.forEach(btn => {
+        const on = btn.dataset.tab === id;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      panels.forEach(p => {
+        p.classList.toggle('active', p.id === 'panel-' + id);
+      });
+      // Resize charts when crime tab becomes visible
+      if (id === 'crime' && window.crimeCharts) {
+        window.crimeCharts.forEach(c => c.resize());
+      }
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => showTab(btn.dataset.tab));
+    });
+
+    // Charts (created once; resize when crime tab opens)
     const chartOpts = {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
     };
 
-    new Chart(document.getElementById('crimeChart'), {
-      type: 'bar',
-      data: {
-        labels: ['Property', 'Auto theft', 'From auto', 'Break & enter'],
-        datasets: [{
-          label: 'Ward 15 · 2025',
-          data: [522, 79, 57, 47],
-          backgroundColor: ['#64748b', '#e11d48', '#fb7185', '#fda4af']
-        }]
-      },
-      options: chartOpts
-    });
-
-    new Chart(document.getElementById('yoyChart'), {
-      type: 'bar',
-      data: {
-        labels: ['2024', '2025', '5-yr avg'],
-        datasets: [{
-          label: 'Property crime',
-          data: [513, 522, 433],
-          backgroundColor: ['#94a3b8', '#0f766e', '#cbd5e1']
-        }]
-      },
-      options: chartOpts
-    });
-
-    new Chart(document.getElementById('wardCompareChart'), {
-      type: 'bar',
-      data: {
-        labels: ['W15 Waterdown', 'W13 Dundas', 'W11 Glanbrook', 'W14 W. Mountain', 'W12 Ancaster'],
-        datasets: [
-          {
+    window.crimeCharts = [
+      new Chart(document.getElementById('crimeChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Property', 'Auto theft', 'From auto', 'Break & enter'],
+          datasets: [{
+            label: 'Ward 15 · 2025',
+            data: [522, 79, 57, 47],
+            backgroundColor: ['#64748b', '#e11d48', '#fb7185', '#fda4af']
+          }]
+        },
+        options: chartOpts
+      }),
+      new Chart(document.getElementById('yoyChart'), {
+        type: 'bar',
+        data: {
+          labels: ['2024', '2025', '5-yr avg'],
+          datasets: [{
             label: 'Property crime',
-            data: [522, 534, 452, 550, 1102],
-            backgroundColor: '#0f766e'
-          },
-          {
-            label: 'Break & enter',
-            data: [47, 66, 31, 25, 101],
-            backgroundColor: '#e11d48'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } },
-        scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
-      }
-    });
+            data: [513, 522, 433],
+            backgroundColor: ['#94a3b8', '#0f766e', '#cbd5e1']
+          }]
+        },
+        options: chartOpts
+      }),
+      new Chart(document.getElementById('wardCompareChart'), {
+        type: 'bar',
+        data: {
+          labels: ['W15 Waterdown', 'W13 Dundas', 'W11 Glanbrook', 'W14 W. Mountain', 'W12 Ancaster'],
+          datasets: [
+            { label: 'Property crime', data: [522, 534, 452, 550, 1102], backgroundColor: '#0f766e' },
+            { label: 'Break & enter', data: [47, 66, 31, 25, 101], backgroundColor: '#e11d48' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } },
+          scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
+        }
+      })
+    ];
   </script>
 </body>
 </html>
