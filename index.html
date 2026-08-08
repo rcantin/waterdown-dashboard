@@ -65,6 +65,14 @@
               <a href="https://hwy5andhwy6interchange.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">MTO project site →</a>
             </div>
           </li>
+          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
+            <span class="text-xs uppercase tracking-wide text-sky-700 bg-sky-50 px-2 py-0.5 rounded w-fit shrink-0" style="font-weight:700">Proposed</span>
+            <div class="min-w-0">
+              <p class="text-slate-900" style="font-weight:700">Long-term care / retirement facility (Parkside)</p>
+              <p class="text-sm text-slate-600">City is considering a 40–70 bed long-term care home on a portion of 207 Parkside Dr (Flamborough YMCA parking lot). Site is institutionally zoned; still in evaluation / proponent stage, not approved for construction. Community consultation held in 2025.</p>
+              <a href="https://www.flamboroughtoday.com/local-news/city-considers-new-long-term-care-facility-in-waterdown-amid-bed-shortage-11266492" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">Coverage →</a>
+            </div>
+          </li>
         </ul>
         <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 text-sm">
           <a href="https://www.hamilton.ca/build-invest-grow/construction-renovation/construction-your-area" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Hamilton City Construction Hub →</a>
@@ -128,9 +136,9 @@
         <button id="refreshNews" class="text-xs text-emerald-700 hover:underline">Refresh</button>
       </div>
       <div id="newsGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <p class="text-sm text-slate-500 col-span-full">Loading latest from FlamboroughToday…</p>
+        <p class="text-sm text-slate-500 col-span-full">Loading latest Ward 15 news…</p>
       </div>
-      <p class="text-xs text-slate-500 mt-3">Live via FlamboroughToday RSS · <a href="https://www.flamboroughtoday.com/local-news" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">More local news →</a></p>
+      <p class="text-xs text-slate-500 mt-3">Ward 15–focused items from FlamboroughToday · <a href="https://www.flamboroughtoday.com/local-news" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">More local news →</a></p>
     </section>
   </main>
 
@@ -144,6 +152,9 @@
     const RSS_URL = 'https://www.flamboroughtoday.com/rss';
     const PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL);
 
+    // Keywords that indicate Ward 15 / Waterdown–Flamborough relevance
+    const WARD15 = /\b(waterdown|flamborough|clappison|parkside|grindstone|millgrove|carlisle|rockton|freelton|greensville|dundas\s+st(?:reet)?\s*e|highway\s*6|hwy\.?\s*6|ward\s*15|alexander\s+place|harry\s+howell|braeburn)\b/i;
+
     function formatDate(d) {
       if (!d) return '';
       const dt = new Date(d);
@@ -156,15 +167,24 @@
       return (tmp.textContent || tmp.innerText || '').trim().slice(0, 160) + (html && html.length > 160 ? '…' : '');
     }
 
+    function isWard15(item) {
+      const text = [item.title, item.description, item.content, item.categories && item.categories.join(' ')].filter(Boolean).join(' ');
+      return WARD15.test(text);
+    }
+
     async function loadNews() {
-      newsGrid.innerHTML = '<p class="text-sm text-slate-500 col-span-full">Loading latest from FlamboroughToday…</p>';
+      newsGrid.innerHTML = '<p class="text-sm text-slate-500 col-span-full">Loading latest Ward 15 news…</p>';
       try {
         const res = await fetch(PROXY);
         const data = await res.json();
         if (data.status !== 'ok' || !data.items || !data.items.length) {
           throw new Error(data.message || 'No items');
         }
-        const items = data.items.slice(0, 6);
+        const items = data.items.filter(isWard15).slice(0, 6);
+        if (!items.length) {
+          newsGrid.innerHTML = '<p class="text-sm text-slate-500 col-span-full">No recent Ward 15–specific items in the feed. <a href="https://www.flamboroughtoday.com/local-news" class="text-emerald-700 underline" target="_blank" rel="noopener">Browse FlamboroughToday</a></p>';
+          return;
+        }
         newsGrid.innerHTML = items.map(item => {
           const title = item.title || 'Untitled';
           const link = item.link || '#';
