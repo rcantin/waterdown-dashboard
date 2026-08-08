@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waterdown Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .card { transition: transform 0.15s ease; }
+    .card:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-emerald-800 text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Waterdown Dashboard</h1>
+        <p class="text-emerald-100 text-sm">Waterdown &amp; Flamborough · Live local info</p>
+      </div>
+      <p class="text-xs text-emerald-200">Updated for iteration · Static demo data</p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <!-- News -->
+    <section>
+      <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> In the News
+      </h2>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-xs text-slate-500 mb-1">Aug 5, 2026 · The Spec</p>
+          <h3 class="font-medium text-slate-900 mb-1">Boil water advisory lifted for Fernbrook Resort</h3>
+          <p class="text-sm text-slate-600">Advisory for Flamborough resort community rescinded after corrective actions and testing.</p>
+          <a href="https://www.thespec.com/news/hamilton-region/boil-water-advisory-lifted-for-flamborough-resort-community/article_74999eed-a958-58eb-8b72-2f6b4415d375.html" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">Read more →</a>
+        </article>
+        <article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-xs text-slate-500 mb-1">Jul 10, 2026 · The Spec</p>
+          <h3 class="font-medium text-slate-900 mb-1">Power restored after Waterdown–Flamborough storm</h3>
+          <p class="text-sm text-slate-600">Thousands without power after brief severe weather; service restored across affected area.</p>
+          <a href="https://www.thespec.com/news/hamilton-region/thousands-in-waterdown-flamborugh-without-power-after-storm/article_8d978612-5ec8-5b40-a859-dd20d44055fc.html" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">Read more →</a>
+        </article>
+        <article class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-xs text-slate-500 mb-1">Local · FlamboroughToday</p>
+          <h3 class="font-medium text-slate-900 mb-1">Waterdown Farmers’ Market updates</h3>
+          <p class="text-sm text-slate-600">Market continues with weather-dependent modifications; check socials for day-of changes.</p>
+          <a href="https://www.flamboroughtoday.com/" class="text-sm text-emerald-700 mt-2 inline-block hover:underline" target="_blank" rel="noopener">FlamboroughToday →</a>
+        </article>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">Sources: The Hamilton Spectator, FlamboroughToday. Replace with live feed/API next.</p>
+    </section>
+
+    <!-- Construction -->
+    <section>
+      <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span> Construction Updates
+      </h2>
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <ul class="divide-y divide-slate-100">
+          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-amber-700 bg-amber-50 px-2 py-0.5 rounded w-fit">Ongoing</span>
+            <div>
+              <p class="font-medium text-slate-900">Regional road work · Waterdown area</p>
+              <p class="text-sm text-slate-600">Check City of Hamilton construction map and 311 for lane closures and timelines near Dundas / Highway 6 corridor.</p>
+            </div>
+          </li>
+          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-slate-600 bg-slate-100 px-2 py-0.5 rounded w-fit">Upcoming</span>
+            <div>
+              <p class="font-medium text-slate-900">Utility &amp; municipal projects</p>
+              <p class="text-sm text-slate-600">Monitor hamilton.ca for capital projects in Flamborough / Waterdown. Add specific project cards as data becomes available.</p>
+            </div>
+          </li>
+        </ul>
+        <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 text-sm">
+          <a href="https://www.hamilton.ca/home-neighbourhood/roads-traffic/construction" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">City construction info →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick reference -->
+    <section>
+      <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-sky-500"></span> Quick Reference
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="https://www.hamilton.ca/home-neighbourhood/garbage-recycling" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
+          <p class="font-medium text-slate-900">Garbage &amp; Recycling</p>
+          <p class="text-sm text-slate-600 mt-1">Collection schedule, green bin, bulk items</p>
+        </a>
+        <a href="https://www.hamilton.ca/" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
+          <p class="font-medium text-slate-900">City of Hamilton</p>
+          <p class="text-sm text-slate-600 mt-1">Services, 311, bylaws, permits</p>
+        </a>
+        <a href="https://hamiltonpolice.on.ca/" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
+          <p class="font-medium text-slate-900">Hamilton Police</p>
+          <p class="text-sm text-slate-600 mt-1">Reports, non-emergency, crime stoppers</p>
+        </a>
+        <a href="https://www.hamilton.ca/home-neighbourhood/garbage-recycling" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-sky-300" target="_blank" rel="noopener">
+          <p class="font-medium text-slate-900">Waste App / Schedule</p>
+          <p class="text-sm text-slate-600 mt-1">Recycle Coach &amp; collection days</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Crime -->
+    <section>
+      <h2 class="text-lg font-semibold text-emerald-900 mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-rose-500"></span> Crime Data
+      </h2>
+      <div class="grid gap-4 lg:grid-cols-2">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-sm font-medium text-slate-700 mb-2">Hamilton overall (2025 HPS report) — trends</p>
+          <canvas id="crimeChart" height="200"></canvas>
+          <p class="text-xs text-slate-500 mt-2">Violent violations up ~10% vs 2024; total CC violations slightly down. Division 3 (incl. Waterdown/Flamborough) had highest youth crime volume in 2025.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+          <p class="text-sm font-medium text-slate-700">Highlights</p>
+          <ul class="text-sm text-slate-600 space-y-2">
+            <li class="flex gap-2"><span class="text-rose-500">•</span> Youth involved in crime city-wide +19.6% (2025 vs 2024); Division 3 highest count.</li>
+            <li class="flex gap-2"><span class="text-rose-500">•</span> Property crime remains the largest volume category.</li>
+            <li class="flex gap-2"><span class="text-rose-500">•</span> Local area is part of HPS Division 3 (Dundas, Flamborough, Waterdown, Mountain, Ancaster, etc.).</li>
+          </ul>
+          <a href="https://hamiltonpolice.on.ca/" class="text-sm text-emerald-700 hover:underline inline-block" target="_blank" rel="noopener">Hamilton Police reports →</a>
+          <p class="text-xs text-slate-500">Demo numbers from public HPS annual reports. Wire live stats next iteration.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+    Waterdown Dashboard · Open source · Iterate with live feeds &amp; maps
+  </footer>
+
+  <script>
+    const ctx = document.getElementById('crimeChart');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Violent 2024', 'Violent 2025', 'Total CC 2024', 'Total CC 2025'],
+        datasets: [{
+          label: 'Violations',
+          data: [7209, 7929, 31467, 31367],
+          backgroundColor: ['#fda4af', '#e11d48', '#94a3b8', '#64748b']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
