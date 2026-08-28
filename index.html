@@ -3,396 +3,340 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Waterdown Dashboard</title>
+  <title>Ward 15 Crime Dashboard · Waterdown & Flamborough</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; font-weight: 300; }
     h1, h2, h3 { font-weight: 700 !important; }
-    .card { transition: transform 0.15s ease, border-color 0.15s ease; }
-    .card:hover { transform: translateY(-2px); }
-    .tab-btn { white-space: nowrap; }
-    .tab-btn.active {
-      color: #065f46;
-      border-bottom-color: #059669;
-      font-weight: 700;
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    #map { height: 420px; width: 100%; }
+    .leaflet-popup-content { font-family: Inter, system-ui, sans-serif; }
+    .chip { cursor: pointer; }
+    .chip.active { background: #065f46; color: #fff; border-color: #065f46; }
+    .inc-row.active { background: #ecfdf5; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
   <header class="bg-emerald-800 text-white shadow-md">
-    <div class="max-w-6xl mx-auto px-4 py-5">
-      <h1 class="text-2xl tracking-tight font-bold">Waterdown Dashboard</h1>
-      <p class="text-emerald-100 text-sm">Waterdown & Flamborough · Local info</p>
+    <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl tracking-tight font-bold">Ward 15 Crime Dashboard</h1>
+        <p class="text-emerald-100 text-sm">Waterdown & Flamborough · Hamilton Police Service data and public reports</p>
+      </div>
+      <a href="https://www.communitycrimemap.com/?address=Waterdown,ON&crimeTypes=%5B1,6,7,10,11,16,17%5D&startDate=14&zoom=14" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg" target="_blank" rel="noopener">Official 60-day HPS map →</a>
     </div>
   </header>
 
-  <nav class="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm" aria-label="Dashboard sections">
-    <div class="max-w-6xl mx-auto px-2 sm:px-4">
-      <div class="flex overflow-x-auto gap-1 -mb-px" role="tablist">
-        <button type="button" role="tab" aria-selected="true" data-tab="projects" class="tab-btn active px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Projects</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="crime" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Crime</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="schools" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Schools</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="hot-topics" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Hot Topics</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="quick-ref" class="tab-btn px-3 sm:px-4 py-3 text-sm text-slate-600 border-b-2 border-transparent hover:text-emerald-800">Quick Reference</button>
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Property crime · 2025</p>
+        <p class="text-2xl font-bold text-slate-900">522</p>
+        <p class="text-xs text-amber-700">+2% vs 2024 · above 5-yr avg 433</p>
       </div>
-    </div>
-  </nav>
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Break & enter · 2025</p>
+        <p class="text-2xl font-bold text-slate-900">47</p>
+        <p class="text-xs text-slate-500">12th of 15 Hamilton wards</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Auto theft · 2025</p>
+        <p class="text-2xl font-bold text-slate-900">79</p>
+        <p class="text-xs text-emerald-700">Down mid-year vs 85 in 2024</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Theft from auto · 2025</p>
+        <p class="text-2xl font-bold text-slate-900">57</p>
+        <p class="text-xs text-slate-500">Rose in some YTD windows</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Violent crime · 2025</p>
+        <p class="text-2xl font-bold text-slate-900">131</p>
+        <p class="text-xs text-slate-500">HPS year-end ward total</p>
+      </div>
+    </section>
 
-  <main class="max-w-6xl mx-auto px-4 py-6">
-    <div id="panel-projects" class="tab-panel active" role="tabpanel">
-      <h2 class="text-lg text-emerald-900 mb-3 font-bold">Community Projects & Construction</h2>
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <ul class="divide-y divide-slate-100">
-          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
-            <span class="text-xs uppercase tracking-wide text-amber-700 bg-amber-50 px-2 py-0.5 rounded w-fit shrink-0" style="font-weight:700">Ongoing</span>
-            <div class="min-w-0">
-              <p class="text-slate-900" style="font-weight:700">Grindstone Creek Bridge replacement</p>
-              <p class="text-sm text-slate-600">Dundas St E between Mill and Reynold. Stage 1 underway since fall 2025: south half removed, foundations in progress; one-lane alternating traffic (eastbound 2 a.m.–2 p.m., westbound 2 p.m.–2 a.m.). Full closures used for girder lifts. Target completion fall 2026.</p>
-              <a href="https://storymaps.arcgis.com/stories/62721f325c2c4f29acabb2ddca562918" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">City project updates →</a>
-            </div>
-          </li>
-          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
-            <span class="text-xs uppercase tracking-wide text-amber-700 bg-amber-50 px-2 py-0.5 rounded w-fit shrink-0" style="font-weight:700">Ongoing</span>
-            <div class="min-w-0">
-              <p class="text-slate-900" style="font-weight:700">Waterdown Road widening</p>
-              <p class="text-sm text-slate-600">Craven Ave (Aldershot) to Mountain Brow Rd. Reconstruction and widening with multi-use path, curbs, storm sewers, and watermain work (Hamilton/Burlington). Started 2024; lane reductions ongoing. Substantial completion expected by end of 2026.</p>
-              <a href="https://www.burlington.ca/en/news/current-city-projects-and-construction/waterdown-road-widening-and-reconstruction-craven-avenue-to-mountain-brow-road.aspx" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">Burlington project page →</a>
-            </div>
-          </li>
-          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
-            <span class="text-xs uppercase tracking-wide text-amber-700 bg-amber-50 px-2 py-0.5 rounded w-fit shrink-0" style="font-weight:700">Ongoing</span>
-            <div class="min-w-0">
-              <p class="text-slate-900" style="font-weight:700">Combined police & fire station</p>
-              <p class="text-sm text-slate-600">Hwy 6 & Parkside Dr. Ground broken summer 2025 on the ~$55M facility with 9-1-1 dispatch and collision reporting centre. About 40 officers and full-time fire staffing planned. Target opening spring 2027.</p>
-              <a href="https://www.flamboroughtoday.com/local-news/officials-break-ground-on-fire-and-police-station-in-waterdown-11018010" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">Coverage & details →</a>
-            </div>
-          </li>
-          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
-            <span class="text-xs uppercase tracking-wide text-amber-700 bg-amber-50 px-2 py-0.5 rounded w-fit shrink-0" style="font-weight:700">Ongoing</span>
-            <div class="min-w-0">
-              <p class="text-slate-900" style="font-weight:700">Waterdown Bypass (East–West Corridor)</p>
-              <p class="text-sm text-slate-600">Planned corridor north of the village core to redirect east–west traffic (linking toward Hwy 6 / Centre Rd / Parkside area). Field construction has been stalled since ~2022 for archaeological work and Indigenous consultation; city staff have indicated a restart is not expected until about 2027. Capital cost is in the ~$58M range and may rise with delays.</p>
-              <a href="https://www.tedmcmeekinward15.com/tedtalks/waterdown-bypass-update" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">Bypass update →</a>
-            </div>
-          </li>
-          <li class="p-4 flex flex-col sm:flex-row sm:items-start gap-3">
-            <span class="text-xs uppercase tracking-wide text-slate-600 bg-slate-100 px-2 py-0.5 rounded w-fit shrink-0" style="font-weight:700">Planned</span>
-            <div class="min-w-0">
-              <p class="text-slate-900" style="font-weight:700">Clappison’s Corners (Hwy 5 & 6) interchange</p>
-              <p class="text-sm text-slate-600">MTO partial cloverleaf (Parclo) interchange replacing the signalized intersection, plus multi-use paths and commuter parking. Design/EA complete; construction expected to start in 2026 and run several years (into ~2028–29). Property expropriations underway.</p>
-              <a href="https://hwy5andhwy6interchange.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">MTO project site →</a>
-            </div>
-          </li>
-        </ul>
-        <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 text-sm">
-          <a href="https://www.hamilton.ca/build-invest-grow/construction-renovation/construction-your-area" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Hamilton City Construction Hub →</a>
+    <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-3">
+        <div>
+          <h2 class="text-lg text-emerald-900 font-bold">Interactive map</h2>
+          <p class="text-sm text-slate-600">Filter compiled public incidents and area notes. Pins are block-level / approximate — HPS offsets exact addresses for privacy.</p>
         </div>
+        <div class="flex flex-wrap gap-2" id="typeFilters"></div>
       </div>
-    </div>
+      <div class="flex flex-wrap gap-2 mb-3" id="areaFilters"></div>
+      <div id="map" class="rounded-lg overflow-hidden border border-slate-200"></div>
+      <p class="text-xs text-slate-500 mt-2">For the official rolling 60-day map (homicide, B&E, robbery, auto theft, theft from vehicle), use the HPS Community Crime Map. This page cannot pull that live feed directly.</p>
+    </section>
 
-    <div id="panel-crime" class="tab-panel" role="tabpanel">
-      <h2 class="text-lg text-emerald-900 mb-3 font-bold">Crime Data · Ward 15</h2>
-      <div class="grid gap-4 lg:grid-cols-2">
-        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Ward 15 totals — 2025</p>
-          <canvas id="crimeChart" height="180"></canvas>
-          <p class="text-xs text-slate-500 mt-2">12th of 15 wards for break-ins. Property crime above the ward’s 5-year average (~433).</p>
+    <section class="grid gap-4 lg:grid-cols-3">
+      <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+          <h2 class="text-lg text-emerald-900 font-bold">Incident details</h2>
+          <input id="searchBox" type="search" placeholder="Search type, area, notes…" class="text-sm border border-slate-200 rounded-lg px-3 py-2 w-full sm:w-64">
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Year over year (property crime)</p>
-          <canvas id="yoyChart" height="180"></canvas>
-          <p class="text-xs text-slate-500 mt-2">2024 ≈ 513 · 2025 ≈ 522 (+~2%). Vehicle thefts in Waterdown trended down into mid-2025.</p>
+        <div class="overflow-auto max-h-80">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="py-2 pr-3">When</th>
+                <th class="py-2 pr-3">Type</th>
+                <th class="py-2 pr-3">Area</th>
+                <th class="py-2">Notes</th>
+              </tr>
+            </thead>
+            <tbody id="incidentTable"></tbody>
+          </table>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm lg:col-span-2">
-          <p class="text-sm text-slate-700 mb-2" style="font-weight:700">Nearby wards — property crime & break-ins (2025)</p>
-          <canvas id="wardCompareChart" height="120"></canvas>
-          <p class="text-xs text-slate-500 mt-2">Comparable suburban / west-end wards. Ward 15 sits near Dundas and Glanbrook on volume; Ancaster is higher.</p>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3 lg:col-span-2">
-          <p class="text-sm text-slate-700" style="font-weight:700">Ward 15 highlights</p>
-          <ul class="text-sm text-slate-600 space-y-2">
-            <li class="flex gap-2"><span class="text-rose-500">•</span> 2025: 522 property crimes, 47 break & enters, 79 auto thefts, 57 thefts from auto (HPS / compiled ward rankings).</li>
-            <li class="flex gap-2"><span class="text-rose-500">•</span> Property crime roughly flat vs 2024 (~513) but above the 5-year average (~433).</li>
-            <li class="flex gap-2"><span class="text-rose-500">•</span> Waterdown vehicle thefts fell (85 in 2024 → 56 reported by mid-2025).</li>
-            <li class="flex gap-2"><span class="text-rose-500">•</span> Division 3 (includes Waterdown/Flamborough) had the highest youth crime volume city-wide in 2025.</li>
-          </ul>
-          <a href="https://www.communitycrimemap.com/?address=Waterdown,ON&crimeTypes=%5B1,6,7,10,11,16,17%5D&startDate=14&zoom=14" class="text-sm text-emerald-700 hover:underline inline-block" target="_blank" rel="noopener">HPS Online Crime Mapping Tool →</a>
-          <p class="text-xs text-slate-500">Sources: HPS ward reports & public 2025 ward rankings. Annual totals; not live.</p>
-        </div>
+        <p id="incCount" class="text-xs text-slate-500 mt-2"></p>
       </div>
-    </div>
+      <div id="detailCard" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <h2 class="text-lg text-emerald-900 font-bold mb-2">Selected incident</h2>
+        <p class="text-sm text-slate-600">Click a map pin or a row to see details, source, and context.</p>
+      </div>
+    </section>
 
-    <div id="panel-schools" class="tab-panel" role="tabpanel">
-      <h2 class="text-lg text-emerald-900 mb-3 font-bold">Community Schools</h2>
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <ul class="divide-y divide-slate-100">
-          <li class="p-4">
-            <p class="text-xs uppercase tracking-wide text-emerald-800 mb-2" style="font-weight:700">HWDSB · Public elementary</p>
-            <div class="space-y-3">
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Allan A. Greenleaf Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · Parkside Dr, Waterdown. Neighbourhood school serving central Waterdown; part of the boundary review for the new Mountainview Heights school.</p>
-                <a href="https://www.hwdsb.on.ca/allanagreenleaf/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Mary Hopkins Elementary</p>
-                <p class="text-sm text-slate-600">JK–4 English & Grades 1–4 French Immersion · Mill St N, Waterdown. Smaller primary-focused school; FI continues into intermediate grades at Guy B. Brown.</p>
-                <a href="https://www.hwdsb.on.ca/maryhopkins/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Guy B. Brown Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 English & French Immersion · Braeheid Ave, Waterdown. Hosts intermediate FI for the Waterdown family of schools.</p>
-                <a href="https://guybbrown.hwdsb.on.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Flamborough Centre Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · Centre Rd. Rural/suburban school serving areas north of Waterdown village; English track after recent FI program changes.</p>
-                <a href="https://flamboroughcentre.hwdsb.on.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Balaclava Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · 10th Concession E (Carlisle / Freelton area). Serves northern Flamborough communities.</p>
-                <a href="https://www.hwdsb.on.ca/balaclava/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Millgrove Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · Millgrove. Small rural school with a close-knit community feel.</p>
-                <a href="https://millgrove.hwdsb.on.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-            </div>
-          </li>
-          <li class="p-4">
-            <p class="text-xs uppercase tracking-wide text-emerald-800 mb-2" style="font-weight:700">HWDSB · Public secondary (local)</p>
-            <div>
-              <p class="text-slate-900" style="font-weight:700">Waterdown District High School</p>
-              <p class="text-sm text-slate-600">Grades 9–12 · Parkside Dr. Home secondary school for Waterdown and Flamborough; offers a range of academic and specialist pathways.</p>
-              <a href="https://waterdowndistrict.hwdsb.on.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-            </div>
-          </li>
-          <li class="p-4">
-            <p class="text-xs uppercase tracking-wide text-emerald-800 mb-2" style="font-weight:700">HWDSB · Common secondary pathways (outside ward)</p>
-            <div class="space-y-3">
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Westdale Secondary School</p>
-                <p class="text-sm text-slate-600">Grades 9–12 · Westdale. French Immersion secondary pathway many Ward 15 FI students continue into after elementary FI at Guy B. Brown / Mary Hopkins.</p>
-                <a href="https://westdale.hwdsb.on.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Glendale Secondary School</p>
-                <p class="text-sm text-slate-600">Grades 9–12 · East Hamilton. Audition-based arts program; used by Ward 15 students seeking specialized arts pathways.</p>
-                <a href="https://www.hwdsb.on.ca/glendale/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Westmount Secondary School</p>
-                <p class="text-sm text-slate-600">Grades 9–12 · West Mountain. Self-directed / alternative learning model often chosen by Ward 15 families looking for a more flexible secondary experience.</p>
-                <a href="https://www.hwdsb.on.ca/westmount/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-            </div>
-          </li>
-          <li class="p-4">
-            <p class="text-xs uppercase tracking-wide text-emerald-800 mb-2" style="font-weight:700">HWCDSB · Catholic elementary</p>
-            <div class="space-y-3">
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Guardian Angels Catholic Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · Centre Rd, Waterdown. Long-standing Catholic school beside St. Thomas the Apostle Parish; recent classroom and daycare addition.</p>
-                <a href="https://guan.hwcdsb.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">St. Thomas the Apostle Catholic Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · Skinner Rd, Waterdown. Newer school (opened 2013) serving east Waterdown growth areas.</p>
-                <a href="https://stth.hwcdsb.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-              <div>
-                <p class="text-slate-900" style="font-weight:700">Our Lady of Mount Carmel Catholic Elementary</p>
-                <p class="text-sm text-slate-600">JK–8 · Carlisle. Serves Carlisle and surrounding rural Flamborough Catholic families.</p>
-                <a href="https://olmc.hwcdsb.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-              </div>
-            </div>
-          </li>
-          <li class="p-4">
-            <p class="text-xs uppercase tracking-wide text-emerald-800 mb-2" style="font-weight:700">HWCDSB · Catholic secondary</p>
-            <div>
-              <p class="text-slate-900" style="font-weight:700">St. Mary Catholic Secondary School</p>
-              <p class="text-sm text-slate-600">Grades 9–12 · West Hamilton. Common secondary destination for Catholic elementary students from Guardian Angels, St. Thomas the Apostle, and Our Lady of Mount Carmel.</p>
-              <a href="https://mary.hwcdsb.ca/" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">School website →</a>
-            </div>
-          </li>
-          <li class="p-4">
-            <p class="text-xs uppercase tracking-wide text-sky-800 mb-2" style="font-weight:700">Coming soon</p>
-            <div>
-              <p class="text-slate-900" style="font-weight:700">New Waterdown Elementary (Mountainview Heights)</p>
-              <p class="text-sm text-slate-600">JK–8 · Skinner Rd & Great Falls Blvd. HWDSB school under construction for the 2027–28 school year: ~504 student spaces plus an 88-space child care centre. Boundary review underway with Allan A. Greenleaf, Mary Hopkins, Guy B. Brown, Flamborough Centre and Balaclava.</p>
-              <a href="https://www.hwdsb.on.ca/school-construction" class="text-sm text-emerald-700 hover:underline" target="_blank" rel="noopener">HWDSB construction updates →</a>
-            </div>
-          </li>
-        </ul>
-        <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 text-sm flex flex-wrap gap-x-4 gap-y-1">
-          <a href="https://www.hwdsb.on.ca/find-school" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">HWDSB find my school →</a>
-          <a href="https://www.hwcdsb.ca/" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">HWCDSB →</a>
-        </div>
+    <section class="grid gap-4 lg:grid-cols-2">
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <h2 class="text-lg text-emerald-900 font-bold mb-2">Ward 15 indicators · 2025 vs 2024</h2>
+        <canvas id="yoyChart" height="180"></canvas>
+        <p class="text-xs text-slate-500 mt-2">Property crime was roughly flat year over year but remained above the five-year average. Auto theft fell from the 2024 peak after HPS Project Polar Bear, though it stayed well above early-2020s levels.</p>
       </div>
-    </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <h2 class="text-lg text-emerald-900 font-bold mb-2">Monthly pattern · property vs violent</h2>
+        <canvas id="trendChart" height="180"></canvas>
+        <p class="text-xs text-slate-500 mt-2">Drawn from HPS Ward 15 monthly reports through early 2026. January 2026 started below the ~37 property / ~10 violent five-year monthly averages; February saw a jump in auto theft and property volume.</p>
+      </div>
+    </section>
 
-    <div id="panel-hot-topics" class="tab-panel" role="tabpanel">
-      <h2 class="text-lg text-emerald-900 mb-3 font-bold">Hot Topics</h2>
-      <p class="text-sm text-slate-600 mb-4">Background on issues people are talking about. Summaries aim to present main viewpoints so you can form your own opinion. Links open in a new tab.</p>
-      <div class="space-y-4">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <p class="text-slate-900 mb-2" style="font-weight:700">AI data centres in the community</p>
-          <p class="text-sm text-slate-600 mb-3">Large AI data centres need a lot of electricity and often water for cooling. Hamilton has seen proposals (including on former industrial harbour land), public meetings with strong turnout, and debate over a pause while the city studies impacts. Other Ontario municipalities have also slowed or reviewed approvals. Federal policy is pushing more Canadian compute capacity; industry pitches investment and tax base; residents raise grid, rates, noise, water, and job-quality concerns.</p>
-          <div class="grid gap-3 sm:grid-cols-2 text-sm mb-3">
-            <div class="bg-slate-50 rounded-lg p-3">
-              <p class="text-slate-800 mb-1" style="font-weight:700">Arguments often made in favour</p>
-              <ul class="text-slate-600 space-y-1 list-disc list-inside">
-                <li>Private capital, construction jobs, and ongoing property tax revenue</li>
-                <li>More domestic computing capacity and less reliance on foreign cloud providers</li>
-                <li>On heavy-industrial sites, existing power infrastructure may limit impact on the residential grid</li>
-                <li>Some designs use non-municipal water (e.g. bay water) or closed-loop cooling to cut potable use</li>
-              </ul>
-            </div>
-            <div class="bg-slate-50 rounded-lg p-3">
-              <p class="text-slate-800 mb-1" style="font-weight:700">Arguments often made against or for caution</p>
-              <ul class="text-slate-600 space-y-1 list-disc list-inside">
-                <li>Very high continuous power demand; risk of pressure on the grid and household rates</li>
-                <li>Water use, noise, heat, and limited permanent local jobs relative to the scale of investment</li>
-                <li>Planning rules designed for lighter industrial uses may not capture full impacts</li>
-                <li>Calls for clearer public consultation and municipal rules before approvals</li>
-              </ul>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <a href="https://www.cbc.ca/news/canada/hamilton/steelport-data-centre-9.7222208" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">CBC: What to know about Hamilton proposals →</a>
-            <a href="https://www.cbc.ca/news/canada/ai-data-centre-opposition-explained-9.7225796" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">CBC: Why opposition is growing →</a>
-            <a href="https://www.theglobeandmail.com/business/commentary/article-ai-data-centres-are-the-future-canada-must-overcome-the-backlash/" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Globe: case for building with better local bargains →</a>
-            <a href="https://taf.ca/growing-data-centre-infrastructure-without-compromising-the-climate/" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">TAF: Ontario energy & climate framing →</a>
-          </div>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <p class="text-slate-900 mb-2" style="font-weight:700">Ticks in our area</p>
-          <p class="text-sm text-slate-600 mb-3">Blacklegged (deer) ticks are established across much of southern Ontario, including the Hamilton region and nearby conservation areas, trails, and grassy or wooded edges. They can carry Lyme disease and other pathogens; American dog ticks are common but do not transmit Lyme. Risk is higher in warmer months when people and pets are outdoors.</p>
-          <div class="text-sm text-slate-600 space-y-2 mb-3">
-            <p><span style="font-weight:700">Identification:</span> Blacklegged ticks are smaller than dog ticks; adults are dark with black legs. Nymphs are poppy-seed sized and easy to miss. Photos submitted to eTick help confirm species.</p>
-            <p><span style="font-weight:700">If you find an attached tick:</span> Use fine-tipped tweezers, grasp close to the skin, and pull straight out steadily—do not twist, squeeze the body, or use heat or petroleum jelly. Clean the area. Save the tick (e.g. sealed container) or photograph it for identification.</p>
-            <p><span style="font-weight:700">After a bite:</span> Lyme is usually only a risk if a blacklegged tick was attached for many hours (often cited as 24+). Watch for fever, fatigue, muscle/joint aches, or an expanding rash (sometimes bull’s-eye) for about 30 days. Contact a health care provider or pharmacist promptly—Ontario guidance allows assessment for preventive antibiotics in some cases. Not every tick is infected, and early treatment is effective when needed.</p>
-            <p><span style="font-weight:700">Prevention:</span> Long clothing, tuck pants into socks, DEET or other approved repellents, stay on paths, check yourself/kids/pets after outdoor time, and reduce yard tick habitat where practical.</p>
-          </div>
-          <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <a href="https://www.ontario.ca/lyme" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Ontario.ca: Lyme disease & ticks →</a>
-            <a href="https://www.etick.ca/" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">eTick.ca: photo ID →</a>
-            <a href="https://www.canada.ca/en/public-health/services/diseases/lyme-disease/prevention-lyme-disease.html" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Canada.ca: prevention →</a>
-            <a href="https://www.publichealthontario.ca/en/Diseases-and-Conditions/Infectious-Diseases/Vector-Borne-Zoonotic-Diseases/Lyme-disease" class="text-emerald-700 hover:underline" target="_blank" rel="noopener">Public Health Ontario: Lyme →</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <section class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+      <h2 class="text-lg text-emerald-900 font-bold mb-2">Compare Hamilton wards · 2025</h2>
+      <p class="text-sm text-slate-600 mb-3">Filter the comparison metric. Ward 15 is highlighted. Volumes are counts, not rates — larger urban wards will often show higher totals.</p>
+      <div class="flex flex-wrap gap-2 mb-3" id="metricFilters"></div>
+      <canvas id="wardChart" height="140"></canvas>
+    </section>
 
-    <div id="panel-quick-ref" class="tab-panel" role="tabpanel">
-      <h2 class="text-lg text-emerald-900 mb-3 font-bold">Quick Reference</h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <a href="https://www.hamilton.ca/home-neighbourhood/garbage-recycling" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
-          <p class="text-slate-900" style="font-weight:700">Garbage & Recycling →</p>
-          <p class="text-sm text-slate-600 mt-1">Collection schedule, green bin, bulk items</p>
-        </a>
-        <a href="https://www.hamilton.ca/" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
-          <p class="text-slate-900" style="font-weight:700">City of Hamilton →</p>
-          <p class="text-sm text-slate-600 mt-1">Services, 311, bylaws, permits</p>
-        </a>
-        <a href="https://hamiltonpolice.on.ca/" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
-          <p class="text-slate-900" style="font-weight:700">Hamilton Police →</p>
-          <p class="text-sm text-slate-600 mt-1">Reports, non-emergency, crime stoppers</p>
-        </a>
-        <a href="https://www.hamilton.ca/city-council/council-committee/city-council-members/city-councillors/ward-15" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
-          <p class="text-slate-900" style="font-weight:700">Ward 15 Info →</p>
-          <p class="text-sm text-slate-600 mt-1">The Flamborough Waterdown city council ward</p>
-        </a>
-        <a href="https://waterdownvillage.ca" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
-          <p class="text-slate-900" style="font-weight:700">Waterdown Village Info →</p>
-          <p class="text-sm text-slate-600 mt-1">Local village business and community info</p>
-        </a>
-        <a href="https://spatialsolutions.maps.arcgis.com/apps/MapSeries/index.html?appid=032433adab93475fb2c54a176235ceb7" class="card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-emerald-600" target="_blank" rel="noopener">
-          <p class="text-slate-900" style="font-weight:700">Ward 15 Census Data →</p>
-          <p class="text-sm text-slate-600 mt-1">Interactive census and demographic maps for Ward 15</p>
-        </a>
+    <section class="bg-slate-50 rounded-xl border border-slate-200 p-4 text-sm text-slate-600 space-y-2">
+      <p class="text-slate-800 font-bold">How to read this dashboard</p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>Year-end totals come from Hamilton Police Service ward reports compiled for 2025.</li>
+        <li>The official live map covers only the past 60 days and five offence types, posted with a one-day delay and block-level offset.</li>
+        <li>Incident pins here are compiled from public HPS releases and local reporting. They are not a complete occurrence list.</li>
+        <li>Division 3 (Waterdown, Flamborough, Dundas, Ancaster and nearby) had the highest youth-crime volume city-wide in 2025.</li>
+      </ul>
+      <div class="flex flex-wrap gap-x-4 gap-y-1 pt-1">
+        <a class="text-emerald-700 hover:underline" href="https://hamiltonpolice.on.ca/ward-reports" target="_blank" rel="noopener">HPS ward reports →</a>
+        <a class="text-emerald-700 hover:underline" href="https://hamiltonpolice.on.ca/how-to/online-crime-mapping-tool" target="_blank" rel="noopener">HPS mapping tool info →</a>
+        <a class="text-emerald-700 hover:underline" href="https://hamiltonpolice.on.ca/" target="_blank" rel="noopener">Hamilton Police →</a>
+        <a class="text-emerald-700 hover:underline" href="https://www.hamilton.ca/city-council/council-committee/city-council-members/city-councillors/ward-15" target="_blank" rel="noopener">Ward 15 councillor page →</a>
       </div>
-    </div>
+    </section>
   </main>
 
   <footer class="border-t border-slate-200 mt-8 py-6 text-center text-xs text-slate-500">
-    Waterdown Dashboard · Open source
+    Ward 15 Crime Dashboard · Compiled from public HPS reports · Not an official police product
   </footer>
 
   <script>
-    const tabs = document.querySelectorAll('.tab-btn');
-    const panels = document.querySelectorAll('.tab-panel');
-    function showTab(id) {
-      tabs.forEach(btn => {
-        const on = btn.dataset.tab === id;
-        btn.classList.toggle('active', on);
-        btn.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
-      panels.forEach(p => {
-        p.classList.toggle('active', p.id === 'panel-' + id);
-      });
-      if (id === 'crime' && window.crimeCharts) {
-        window.crimeCharts.forEach(c => c.resize());
-      }
-    }
-    tabs.forEach(btn => {
-      btn.addEventListener('click', () => showTab(btn.dataset.tab));
-    });
-    const chartOpts = {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
+    const TYPES = ['All', 'Auto theft', 'Break & enter', 'Theft from auto', 'Robbery', 'Assault', 'Shooting', 'Home invasion'];
+    const AREAS = ['All areas', 'Waterdown village', 'Mountainview / Great Falls', 'Hwy 5 / Dundas corridor', 'Hwy 6 / rural Flamborough', 'Parkside / Centre Rd'];
+
+    const incidents = [
+      { id:1, date:'2024-07', type:'Shooting', area:'Hwy 6 / rural Flamborough', lat:43.3605, lng:-79.9820, title:'Hwy 6 North party shooting', notes:'One person killed and others injured after a large party on Hwy 6 North. Neighbours cited earlier gunfire on the same stretch and asked for more patrol presence.', source:'CHCH / local reporting', sourceUrl:'https://www.chch.com/chch-news/community-of-flamborough-shaken-after-triple-shooting-leaves-1-dead/' },
+      { id:2, date:'2024-08', type:'Home invasion', area:'Mountainview / Great Falls', lat:43.3288, lng:-79.8885, title:'Great Falls Blvd vehicle-key invasion', notes:'Resident woke to glass breaking; suspect demanded keys to a luxury SUV and fled toward Waterdown Road. Part of a broader high-end vehicle theft pattern.', source:'HPS / CHCH', sourceUrl:'https://www.youtube.com/watch?v=JSHJJW_2Hsk' },
+      { id:3, date:'2024-08', type:'Break & enter', area:'Waterdown village', lat:43.3319, lng:-79.8928, title:'Commercial B&Es in Waterdown', notes:'Three businesses targeted Aug. 20, 2024. HPS BEAR unit later arrested two people after a related flight from police.', source:'Hamilton Police', sourceUrl:'https://hamiltonpolice.on.ca/news/arrests-made-in-series-of-waterdown-commercial-break-and-enters/' },
+      { id:4, date:'2024-11', type:'Break & enter', area:'Waterdown village', lat:43.3342, lng:-79.8975, title:'Daytime canvassing crews', notes:'HPS warned of daytime residential entries in Hamilton, Stoney Creek, Waterdown and Ancaster. Suspects knock first, then return if no one answers.', source:'Hamilton Police', sourceUrl:'https://hamiltonpolice.on.ca/news/hamilton-police-update-community-on-daytime-entries/' },
+      { id:5, date:'2024-08', type:'Home invasion', area:'Parkside / Centre Rd', lat:43.3426, lng:-79.9058, title:'Attempted Mercedes theft', notes:'Four suspects forced entry near Centre Rd and Parkside Dr, demanded keys to two Mercedes vehicles, then fled. Police described it as targeted.', source:'CHCH', sourceUrl:'https://www.chch.com/chch-news/hamilton-police-seek-4-hooded-suspects-in-waterdown-home-invasion/' },
+      { id:6, date:'2025-09', type:'Auto theft', area:'Waterdown village', lat:43.3335, lng:-79.9012, title:'Auto theft trend (town hall)', notes:'HPS told a Waterdown town hall that thefts fell from 85 in 2024 to 56 by mid-2025, still far above the 2021 low of 16. Project Polar Bear was credited for part of the drop.', source:'FlamboroughToday / HPS', sourceUrl:'https://www.flamboroughtoday.com/local-news/hamilton-police-say-car-thefts-are-down-in-waterdown-as-mpp-calls-for-bail-reform-11191392' },
+      { id:7, date:'2025-09', type:'Theft from auto', area:'Hwy 5 / Dundas corridor', lat:43.3188, lng:-79.9095, title:'Theft from auto rising', notes:'Analyst briefing: theft from auto increased in a 2025 year-to-date window (about 34 to 43) even as several other indicators declined.', source:'HPS Division 3 briefing', sourceUrl:'https://www.youtube.com/watch?v=B6ohl18Eq4U' },
+      { id:8, date:'2025-09', type:'Robbery', area:'Waterdown village', lat:43.3304, lng:-79.8948, title:'Robbery up in Ward 15', notes:'HPS year-to-date comparison at the Sept. 2025 town hall: robbery increased while B&E, auto theft and some other categories decreased.', source:'HPS Division 3 briefing', sourceUrl:'https://www.youtube.com/watch?v=B6ohl18Eq4U' },
+      { id:9, date:'2026-02', type:'Auto theft', area:'Waterdown village', lat:43.3368, lng:-79.8890, title:'February 2026 auto-theft spike', notes:'HPS Ward 15 February 2026 report: 11 auto thefts in the month, bringing YTD auto theft to 11 after a quieter January.', source:'HPS Ward 15 Feb 2026 report', sourceUrl:'https://hamiltonpolice.on.ca/sites/default/files/15_feb.pdf' },
+      { id:10, date:'2026-01', type:'Assault', area:'Parkside / Centre Rd', lat:43.3402, lng:-79.8994, title:'January 2026 violent volume', notes:'January 2026 ward report: 5 assaults, 11 violent crimes and 15 property crimes for the month — violent volume above the ~9.6 five-year monthly average.', source:'HPS Ward 15 Jan 2026 report', sourceUrl:'https://hamiltonpolice.on.ca/sites/default/files/15_jan.pdf' },
+      { id:11, date:'2025-07', type:'Assault', area:'Hwy 6 / rural Flamborough', lat:43.3550, lng:-79.9755, title:'Mid-2025 assault YTD', notes:'By July 2025, Ward 15 had 44 assaults year-to-date (10 in July). Property crime YTD was 320; violent YTD was 83.', source:'HPS Ward 15 Jul 2025 report', sourceUrl:'https://hamiltonpolice.on.ca/sites/default/files/15_jul.pdf' },
+      { id:12, date:'2025-08', type:'Auto theft', area:'Hwy 5 / Dundas corridor', lat:43.3215, lng:-79.9188, title:'August 2025 auto theft YTD', notes:'Through August 2025: 54 auto thefts YTD, 31 break-and-enters, 41 thefts from auto, 49 assaults, 11 robberies.', source:'HPS Ward 15 Aug 2025 report', sourceUrl:'https://hamiltonpolice.on.ca/sites/default/files/15_aug.pdf' }
+    ];
+
+    const wards = [
+      { w:'W3 Crown Point', p:2151, be:259, auto:143, from:301 },
+      { w:'W2 Downtown', p:2362, be:171, auto:137, from:439 },
+      { w:'W4 East lower', p:1500, be:109, auto:106, from:143 },
+      { w:'W12 Ancaster', p:1102, be:101, auto:118, from:124 },
+      { w:'W5 Stoney Creek', p:1838, be:84, auto:160, from:173 },
+      { w:'W8 W. Mountain', p:1215, be:79, auto:118, from:123 },
+      { w:'W1 Westdale', p:1300, be:77, auto:49, from:157 },
+      { w:'W7 C. Mountain', p:1360, be:71, auto:137, from:137 },
+      { w:'W6 E. Mountain', p:916, be:68, auto:112, from:109 },
+      { w:'W13 Dundas', p:534, be:66, auto:41, from:49 },
+      { w:'W10 Stoney Cr. L', p:687, be:54, auto:111, from:82 },
+      { w:'W15 Waterdown', p:522, be:47, auto:79, from:57 },
+      { w:'W9 SC Mountain', p:1024, be:37, auto:155, from:100 },
+      { w:'W11 Glanbrook', p:452, be:31, auto:92, from:74 },
+      { w:'W14 W. Mtn new', p:550, be:25, auto:69, from:54 }
+    ];
+
+    let activeType = 'All';
+    let activeArea = 'All areas';
+    let search = '';
+    let map, markersLayer, wardChart;
+
+    const colors = {
+      'Auto theft':'#0f766e',
+      'Break & enter':'#e11d48',
+      'Theft from auto':'#fb7185',
+      'Robbery':'#b45309',
+      'Assault':'#7c3aed',
+      'Shooting':'#111827',
+      'Home invasion':'#be123c'
     };
-    window.crimeCharts = [
-      new Chart(document.getElementById('crimeChart'), {
+
+    function filtered() {
+      return incidents.filter(i =>
+        (activeType === 'All' || i.type === activeType) &&
+        (activeArea === 'All areas' || i.area === activeArea) &&
+        (`${i.type} ${i.area} ${i.title} ${i.notes}`.toLowerCase().includes(search))
+      );
+    }
+
+    function renderChips(el, items, current, setter) {
+      el.innerHTML = items.map(item =>
+        `<button type="button" class="chip text-xs px-3 py-1 rounded-full border border-slate-300 ${item===current?'active':''}">${item}</button>`
+      ).join('');
+      el.querySelectorAll('button').forEach((btn, idx) => {
+        btn.addEventListener('click', () => { setter(items[idx]); refresh(); });
+      });
+    }
+
+    function renderTable() {
+      const rows = filtered();
+      document.getElementById('incidentTable').innerHTML = rows.map(i => `
+        <tr class="inc-row border-b border-slate-100 cursor-pointer hover:bg-emerald-50" data-id="${i.id}">
+          <td class="py-2 pr-3 whitespace-nowrap">${i.date}</td>
+          <td class="py-2 pr-3">${i.type}</td>
+          <td class="py-2 pr-3">${i.area}</td>
+          <td class="py-2">${i.title}</td>
+        </tr>`).join('');
+      document.getElementById('incCount').textContent = `${rows.length} compiled public incidents shown`;
+      document.querySelectorAll('.inc-row').forEach(tr => {
+        tr.addEventListener('click', () => selectIncident(+tr.dataset.id));
+      });
+    }
+
+    function selectIncident(id) {
+      const i = incidents.find(x => x.id === id);
+      if (!i) return;
+      document.querySelectorAll('.inc-row').forEach(tr => tr.classList.toggle('active', +tr.dataset.id === id));
+      document.getElementById('detailCard').innerHTML = `
+        <h2 class="text-lg text-emerald-900 font-bold mb-1">${i.title}</h2>
+        <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">${i.date} · ${i.type} · ${i.area}</p>
+        <p class="text-sm text-slate-600 mb-3">${i.notes}</p>
+        <a class="text-sm text-emerald-700 hover:underline" href="${i.sourceUrl}" target="_blank" rel="noopener">${i.source} →</a>
+        <p class="text-xs text-slate-500 mt-3">Location is approximate and offset from any exact address.</p>`;
+      if (map) map.setView([i.lat, i.lng], 14);
+    }
+
+    function renderMap() {
+      if (!map) {
+        map = L.map('map').setView([43.333, -79.90], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        markersLayer = L.layerGroup().addTo(map);
+        L.circle([43.333, -79.90], { radius: 3500, color:'#065f46', weight:1, fillOpacity:0.04 }).addTo(map);
+      }
+      markersLayer.clearLayers();
+      filtered().forEach(i => {
+        const m = L.circleMarker([i.lat, i.lng], {
+          radius: 8, color: '#fff', weight: 1,
+          fillColor: colors[i.type] || '#334155', fillOpacity: 0.9
+        }).bindPopup(`<strong>${i.title}</strong><br>${i.type} · ${i.date}<br>${i.area}`);
+        m.on('click', () => selectIncident(i.id));
+        markersLayer.addLayer(m);
+      });
+    }
+
+    function refresh() {
+      renderChips(document.getElementById('typeFilters'), TYPES, activeType, v => activeType = v);
+      renderChips(document.getElementById('areaFilters'), AREAS, activeArea, v => activeArea = v);
+      renderTable();
+      renderMap();
+    }
+
+    document.getElementById('searchBox').addEventListener('input', e => {
+      search = e.target.value.toLowerCase();
+      refresh();
+    });
+
+    new Chart(document.getElementById('yoyChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Property', 'Auto theft*', 'From auto', 'Break & enter', 'Violent'],
+        datasets: [
+          { label: '2024', data: [513, 85, null, null, 128], backgroundColor: '#94a3b8' },
+          { label: '2025', data: [522, 79, 57, 47, 131], backgroundColor: '#0f766e' }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: {
+        labels: ['Jul 25', 'Aug 25', 'Jan 26', 'Feb 26'],
+        datasets: [
+          { label: 'Property (month)', data: [46, 33, 15, 40], borderColor: '#0f766e', tension: 0.25 },
+          { label: 'Violent (month)', data: [18, 10, 11, 13], borderColor: '#e11d48', tension: 0.25 }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    const metrics = [
+      { key: 'p', label: 'Property crime' },
+      { key: 'be', label: 'Break & enter' },
+      { key: 'auto', label: 'Auto theft' },
+      { key: 'from', label: 'Theft from auto' }
+    ];
+    let activeMetric = 'p';
+
+    function drawWards() {
+      const colorsBar = wards.map(w => w.w.startsWith('W15') ? '#0f766e' : '#94a3b8');
+      if (wardChart) wardChart.destroy();
+      wardChart = new Chart(document.getElementById('wardChart'), {
         type: 'bar',
         data: {
-          labels: ['Property', 'Auto theft', 'From auto', 'Break & enter'],
-          datasets: [{
-            label: 'Ward 15 · 2025',
-            data: [522, 79, 57, 47],
-            backgroundColor: ['#64748b', '#e11d48', '#fb7185', '#fda4af']
-          }]
-        },
-        options: chartOpts
-      }),
-      new Chart(document.getElementById('yoyChart'), {
-        type: 'bar',
-        data: {
-          labels: ['2024', '2025', '5-yr avg'],
-          datasets: [{
-            label: 'Property crime',
-            data: [513, 522, 433],
-            backgroundColor: ['#94a3b8', '#0f766e', '#cbd5e1']
-          }]
-        },
-        options: chartOpts
-      }),
-      new Chart(document.getElementById('wardCompareChart'), {
-        type: 'bar',
-        data: {
-          labels: ['W15 Waterdown', 'W13 Dundas', 'W11 Glanbrook', 'W14 W. Mountain', 'W12 Ancaster'],
-          datasets: [
-            { label: 'Property crime', data: [522, 534, 452, 550, 1102], backgroundColor: '#0f766e' },
-            { label: 'Break & enter', data: [47, 66, 31, 25, 101], backgroundColor: '#e11d48' }
-          ]
+          labels: wards.map(w => w.w),
+          datasets: [{ label: metrics.find(m => m.key===activeMetric).label, data: wards.map(w => w[activeMetric]), backgroundColor: colorsBar }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom' } },
-          scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } }
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { maxRotation: 60, minRotation: 45, font: { size: 10 } } }, y: { beginAtZero: true } }
         }
-      })
-    ];
+      });
+    }
+
+    function renderMetrics() {
+      const el = document.getElementById('metricFilters');
+      el.innerHTML = metrics.map(m =>
+        `<button type="button" class="chip text-xs px-3 py-1 rounded-full border border-slate-300 ${m.key===activeMetric?'active':''}">${m.label}</button>`
+      ).join('');
+      el.querySelectorAll('button').forEach((btn, idx) => {
+        btn.addEventListener('click', () => { activeMetric = metrics[idx].key; renderMetrics(); drawWards(); });
+      });
+    }
+
+    renderMetrics();
+    drawWards();
+    refresh();
   </script>
 </body>
 </html>
