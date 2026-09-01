@@ -19,6 +19,8 @@
     .chip { cursor: pointer; }
     .chip.active { background: #065f46; color: #fff; border-color: #065f46; }
     .inc-row.active { background: #ecfdf5; }
+    .chip-indigo.active { background: #3730a3; color: #fff; border-color: #3730a3; }
+    .hps-section { border-color: #c7d2fe; background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 140px); }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -28,7 +30,10 @@
         <h1 class="text-2xl tracking-tight font-bold">Ward 15 Crime Dashboard</h1>
         <p class="text-emerald-100 text-sm">Waterdown & Flamborough · Hamilton Police Service data and public reports</p>
       </div>
-      <a href="https://www.communitycrimemap.com/?address=Waterdown,ON&crimeTypes=%5B1,6,7,10,11,16,17%5D&startDate=14&zoom=14" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg" target="_blank" rel="noopener">Official 60-day HPS map →</a>
+      <div class="flex flex-wrap gap-2">
+        <a href="#hps-reports" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg">Official ward reports ↓</a>
+        <a href="https://www.communitycrimemap.com/?address=Waterdown,ON&crimeTypes=%5B1,6,7,10,11,16,17%5D&startDate=14&zoom=14" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg" target="_blank" rel="noopener">Official 60-day HPS map →</a>
+      </div>
     </div>
   </header>
 
@@ -121,10 +126,162 @@
       <canvas id="wardChart" height="140"></canvas>
     </section>
 
+    <section id="hps-reports" class="hps-section rounded-2xl border-2 p-4 sm:p-6 space-y-5">
+      <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
+        <div>
+          <p class="text-xs uppercase tracking-wide text-indigo-700 font-bold">Separate source · official HPS Ward Reports</p>
+          <h2 class="text-xl text-indigo-950 font-bold mt-1">Hamilton Police ward reports, compared</h2>
+          <p class="text-sm text-slate-600 mt-1 max-w-3xl">These numbers come from the three-page monthly PDFs HPS posts for every ward at <a class="text-indigo-700 hover:underline" href="https://hamiltonpolice.on.ca/ward-reports" target="_blank" rel="noopener">hamiltonpolice.on.ca/ward-reports</a>. They are occurrence totals (year-end December files for 2024 and 2025, plus Ward 15 monthlies through May 2026). They are not the same as the compiled public-incident pins on the map above, and they are preliminary — HPS says snapshots can change after coding.</p>
+        </div>
+        <div class="flex flex-col gap-2 shrink-0">
+          <a class="text-sm text-indigo-700 hover:underline" href="https://hamiltonpolice.on.ca/sites/default/files/ward_report_companion_document.pdf" target="_blank" rel="noopener">Companion document (definitions) →</a>
+          <a class="text-sm text-indigo-700 hover:underline" href="https://hamiltonpolice.on.ca/sites/default/files/15_dec.pdf" target="_blank" rel="noopener">Ward 15 · Dec 2025 year-end PDF →</a>
+        </div>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <p class="text-xs uppercase tracking-wide text-slate-500">Ward 15 property · 2025</p>
+          <p class="text-2xl font-bold text-slate-900">522</p>
+          <p class="text-xs text-amber-700">+8 vs 514 in 2024 · +20% vs 5-yr avg 433</p>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <p class="text-xs uppercase tracking-wide text-slate-500">Ward 15 violent · 2025</p>
+          <p class="text-2xl font-bold text-slate-900">132</p>
+          <p class="text-xs text-amber-700">+6 vs 126 in 2024 · +19% vs 5-yr avg 111</p>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <p class="text-xs uppercase tracking-wide text-slate-500">2026 through May</p>
+          <p class="text-2xl font-bold text-slate-900">190 / 55</p>
+          <p class="text-xs text-slate-500">Property / violent year-to-date</p>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <p class="text-xs uppercase tracking-wide text-slate-500">Rank among 15 wards</p>
+          <p class="text-2xl font-bold text-slate-900">14th</p>
+          <p class="text-xs text-slate-500">Property and violent volume in 2025</p>
+        </div>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-2">
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-1">What changed in Ward 15</h3>
+          <p class="text-xs text-slate-500 mb-3">December year-end reports. Vehicles and break-ins moved in opposite directions.</p>
+          <canvas id="hpsYoyChart" height="200"></canvas>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4 overflow-auto">
+          <h3 class="text-base text-indigo-950 font-bold mb-2">Indicator table</h3>
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200">
+              <tr><th class="py-2 pr-2">Indicator</th><th class="py-2 pr-2 text-right">2024</th><th class="py-2 pr-2 text-right">2025</th><th class="py-2 text-right">Change</th></tr>
+            </thead>
+            <tbody class="text-slate-700">
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Property crime</td><td class="text-right pr-2">514</td><td class="text-right pr-2">522</td><td class="text-right text-amber-700">+8</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Violent crime</td><td class="text-right pr-2">126</td><td class="text-right pr-2">132</td><td class="text-right text-amber-700">+6</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Auto theft</td><td class="text-right pr-2">105</td><td class="text-right pr-2">79</td><td class="text-right text-emerald-700">−26</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Break and enter</td><td class="text-right pr-2">61</td><td class="text-right pr-2">47</td><td class="text-right text-emerald-700">−14</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Theft from auto</td><td class="text-right pr-2">47</td><td class="text-right pr-2">57</td><td class="text-right text-amber-700">+10</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Assault</td><td class="text-right pr-2">68</td><td class="text-right pr-2">70</td><td class="text-right text-slate-500">+2</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Robbery</td><td class="text-right pr-2">8</td><td class="text-right pr-2">11</td><td class="text-right text-amber-700">+3</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Sexual violation</td><td class="text-right pr-2">21</td><td class="text-right pr-2">12</td><td class="text-right text-emerald-700">−9</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Shootings</td><td class="text-right pr-2">2</td><td class="text-right pr-2">1</td><td class="text-right text-emerald-700">−1</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-1.5 pr-2">Calls for service</td><td class="text-right pr-2">2,215</td><td class="text-right pr-2">2,273</td><td class="text-right text-slate-500">+58</td></tr>
+              <tr><td class="py-1.5 pr-2">Collisions</td><td class="text-right pr-2">401</td><td class="text-right pr-2">391</td><td class="text-right text-emerald-700">−10</td></tr>
+            </tbody>
+          </table>
+          <p class="text-xs text-slate-500 mt-2">Calls for service and collisions measure workload, not offences.</p>
+        </div>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-3">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-1">Ward 15 monthly path</h3>
+          <p class="text-xs text-slate-500 mb-3">Month-of counts from posted Ward 15 PDFs. Some mid-2024 files are no longer on the site, so the line has gaps before June 2025.</p>
+          <canvas id="hpsMonthlyChart" height="160"></canvas>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-2">2026 so far (Jan–May)</h3>
+          <ul class="text-sm text-slate-700 space-y-2">
+            <li class="flex justify-between gap-3"><span>Property YTD</span><span class="font-bold">190</span></li>
+            <li class="flex justify-between gap-3"><span>Violent YTD</span><span class="font-bold">55</span></li>
+            <li class="flex justify-between gap-3"><span>Auto theft YTD</span><span class="font-bold">36</span></li>
+            <li class="flex justify-between gap-3"><span>Theft from auto YTD</span><span class="font-bold">25</span></li>
+            <li class="flex justify-between gap-3"><span>Break and enter YTD</span><span class="font-bold">14</span></li>
+            <li class="flex justify-between gap-3"><span>Assault YTD</span><span class="font-bold">30</span></li>
+          </ul>
+          <p class="text-xs text-slate-500 mt-3">February alone had 11 auto thefts. A typical Ward 15 month is about 35–45 property and 8–12 violent incidents (5-year monthly averages ~37 / ~10).</p>
+        </div>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-2">
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-1">Citywide pattern, 2024 → 2025</h3>
+          <p class="text-xs text-slate-500 mb-3">Sum of all 15 ward year-end reports — useful context so Ward 15 is not read in isolation.</p>
+          <canvas id="hpsCityChart" height="150"></canvas>
+          <ul class="text-sm text-slate-600 mt-3 space-y-1">
+            <li>Property crime fell in most wards: <strong>19,047 → 17,513 (−8%)</strong>.</li>
+            <li>Violent crime rose even as property fell: <strong>7,150 → 7,822 (+9%)</strong>.</li>
+            <li>Break-ins dropped almost everywhere. Theft from vehicles rose in many wards, including Ward 15.</li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-1">Nearby suburban wards · 2025</h3>
+          <p class="text-xs text-slate-500 mb-3">Same-year raw counts. Downtown wards are much larger; this set is the fairer neighbourhood comparison.</p>
+          <canvas id="hpsSuburbChart" height="170"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-indigo-100 p-4 overflow-auto">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-base text-indigo-950 font-bold">All 15 wards · 2025 ranks</h3>
+            <p class="text-xs text-slate-500">1 = highest raw count, not a rate per resident. Ward 15 highlighted.</p>
+          </div>
+          <div class="flex flex-wrap gap-2" id="hpsRankFilters"></div>
+        </div>
+        <div class="overflow-auto max-h-80">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200 sticky top-0 bg-white">
+              <tr>
+                <th class="py-2 pr-3">Ward</th>
+                <th class="py-2 pr-3 text-right">Property</th>
+                <th class="py-2 pr-3 text-right">Violent</th>
+                <th class="py-2 pr-3 text-right">Auto</th>
+                <th class="py-2 pr-3 text-right">B&E</th>
+                <th class="py-2 pr-3 text-right">From auto</th>
+                <th class="py-2 text-right">Assault</th>
+              </tr>
+            </thead>
+            <tbody id="hpsWardTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-2">
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-2">Watch list from the reports</h3>
+          <ul class="text-sm text-slate-600 space-y-2">
+            <li><span class="font-bold text-slate-800">Vehicles, not homes, are the 2026 pressure.</span> Auto theft and theft-from-auto keep showing up in early-2026 monthlies after a 2025 drop in stolen cars.</li>
+            <li><span class="font-bold text-slate-800">Quiet vs its own average.</span> Ward 15 is 14th of 15 on volume, but 2025 property and violent totals were both above this ward’s five-year average.</li>
+            <li><span class="font-bold text-slate-800">Robbery ticked up from a small base</span> (8 → 11). Sexual violations and break-ins moved the other way.</li>
+            <li><span class="font-bold text-slate-800">Shootings stay rare</span> (2 in 2024, 1 in 2025). A low annual count can still include a high-harm event, as on Hwy 6 North in 2024.</li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-xl border border-indigo-100 p-4">
+          <h3 class="text-base text-indigo-950 font-bold mb-2">How to read an HPS ward PDF</h3>
+          <ul class="text-sm text-slate-600 space-y-2">
+            <li><span class="font-bold text-slate-800">Page 1</span> — five-year annual trend for violent crime, property crime, shootings, calls for service, and collisions, plus a citywide 911 total.</li>
+            <li><span class="font-bold text-slate-800">Page 2</span> — year-to-date and this-month counts for assault, auto theft, break-and-enter, theft from auto, theft over, robbery, sexual violation, plus property vs violent monthly trend.</li>
+            <li><span class="font-bold text-slate-800">Page 3</span> — top call types, calls-for-service trend, collisions. Workload, not crime.</li>
+            <li>February reports are often marked N/A. HPS also reuses filenames (for example <code>15_jan.pdf</code> becomes the next January), so always check the title on page 2.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <section class="bg-slate-50 rounded-xl border border-slate-200 p-4 text-sm text-slate-600 space-y-2">
       <p class="text-slate-800 font-bold">How to read this dashboard</p>
       <ul class="list-disc list-inside space-y-1">
-        <li>Year-end totals come from Hamilton Police Service ward reports compiled for 2025.</li>
+        <li>The indigo block is parsed from official HPS ward-report PDFs (December 2024 and 2025 year-ends, plus Ward 15 monthlies through May 2026).</li>
         <li>The official live map covers only the past 60 days and five offence types, posted with a one-day delay and block-level offset.</li>
         <li>Incident pins here are compiled from public HPS releases and local reporting. They are not a complete occurrence list.</li>
         <li>Division 3 (Waterdown, Flamborough, Dundas, Ancaster and nearby) had the highest youth-crime volume city-wide in 2025.</li>
@@ -337,6 +494,115 @@
     renderMetrics();
     drawWards();
     refresh();
+
+    const hpsWards = [
+      { w:1, name:'Westdale / Ainslie Wood', p:1300, v:386, auto:49, be:77, from:157, as:219 },
+      { w:2, name:'Downtown / Beasley / Durand', p:2362, v:1548, auto:137, be:171, from:439, as:1035 },
+      { w:3, name:'Crown Point / Landsdale', p:2151, v:1412, auto:143, be:259, from:301, as:920 },
+      { w:4, name:'East Lower / Riverdale', p:1500, v:802, auto:106, be:109, from:143, as:475 },
+      { w:5, name:'Stoney Creek / Bayfront', p:1838, v:624, auto:160, be:84, from:173, as:358 },
+      { w:6, name:'East Mountain', p:916, v:449, auto:112, be:68, from:109, as:244 },
+      { w:7, name:'Central Mountain', p:1360, v:600, auto:137, be:71, from:137, as:344 },
+      { w:8, name:'West Mountain / Buchanan', p:1215, v:485, auto:118, be:79, from:123, as:294 },
+      { w:9, name:'Stoney Creek Mountain', p:1024, v:314, auto:155, be:37, from:100, as:183 },
+      { w:10, name:'Stoney Creek (lower)', p:687, v:269, auto:111, be:54, from:82, as:137 },
+      { w:11, name:'Glanbrook / Binbrook', p:452, v:129, auto:92, be:31, from:74, as:65 },
+      { w:12, name:'Ancaster', p:1102, v:196, auto:118, be:101, from:124, as:93 },
+      { w:13, name:'Dundas', p:534, v:160, auto:41, be:66, from:49, as:89 },
+      { w:14, name:'West Mountain (newer)', p:550, v:316, auto:69, be:25, from:54, as:161 },
+      { w:15, name:'Waterdown / Flamborough', p:522, v:132, auto:79, be:47, from:57, as:70 }
+    ];
+
+    function rankVals(key) {
+      const sorted = [...hpsWards].sort((a,b) => b[key]-a[key]);
+      const map = {};
+      sorted.forEach((row, i) => { map[row.w] = i+1; });
+      return map;
+    }
+
+    let hpsSort = 'p';
+    const hpsSortKeys = [
+      { key:'p', label:'Property' },
+      { key:'v', label:'Violent' },
+      { key:'auto', label:'Auto theft' },
+      { key:'be', label:'B&E' },
+      { key:'from', label:'From auto' },
+      { key:'as', label:'Assault' }
+    ];
+
+    function renderHpsTable() {
+      const ranks = {
+        p: rankVals('p'), v: rankVals('v'), auto: rankVals('auto'),
+        be: rankVals('be'), from: rankVals('from'), as: rankVals('as')
+      };
+      const rows = [...hpsWards].sort((a,b) => b[hpsSort]-a[hpsSort]);
+      document.getElementById('hpsWardTable').innerHTML = rows.map(r => `
+        <tr class="border-b border-slate-100 ${r.w===15?'bg-indigo-50 font-semibold':''}">
+          <td class="py-1.5 pr-3">W${r.w} ${r.name}</td>
+          <td class="py-1.5 pr-3 text-right">${r.p.toLocaleString()} <span class="text-xs text-slate-400">#${ranks.p[r.w]}</span></td>
+          <td class="py-1.5 pr-3 text-right">${r.v.toLocaleString()} <span class="text-xs text-slate-400">#${ranks.v[r.w]}</span></td>
+          <td class="py-1.5 pr-3 text-right">${r.auto} <span class="text-xs text-slate-400">#${ranks.auto[r.w]}</span></td>
+          <td class="py-1.5 pr-3 text-right">${r.be} <span class="text-xs text-slate-400">#${ranks.be[r.w]}</span></td>
+          <td class="py-1.5 pr-3 text-right">${r.from} <span class="text-xs text-slate-400">#${ranks.from[r.w]}</span></td>
+          <td class="py-1.5 text-right">${r.as} <span class="text-xs text-slate-400">#${ranks.as[r.w]}</span></td>
+        </tr>`).join('');
+      const el = document.getElementById('hpsRankFilters');
+      el.innerHTML = hpsSortKeys.map(m =>
+        `<button type="button" class="chip chip-indigo text-xs px-3 py-1 rounded-full border border-indigo-200 ${m.key===hpsSort?'active':''}">Sort: ${m.label}</button>`
+      ).join('');
+      el.querySelectorAll('button').forEach((btn, idx) => {
+        btn.addEventListener('click', () => { hpsSort = hpsSortKeys[idx].key; renderHpsTable(); });
+      });
+    }
+    renderHpsTable();
+
+    new Chart(document.getElementById('hpsYoyChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Property', 'Violent', 'Auto theft', 'B&E', 'From auto', 'Assault', 'Robbery', 'Sexual'],
+        datasets: [
+          { label: '2024 year-end', data: [514, 126, 105, 61, 47, 68, 8, 21], backgroundColor: '#94a3b8' },
+          { label: '2025 year-end', data: [522, 132, 79, 47, 57, 70, 11, 12], backgroundColor: '#4338ca' }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById('hpsMonthlyChart'), {
+      type: 'line',
+      data: {
+        labels: ['Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26','May 26'],
+        datasets: [
+          { label: 'Property this month', data: [29,46,33,45,48,38,36,15,40,36,45,59], borderColor: '#4338ca', tension: 0.25, pointRadius: 3 },
+          { label: 'Violent this month', data: [11,18,10,16,10,6,7,11,13,11,11,9], borderColor: '#e11d48', tension: 0.25, pointRadius: 3 }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById('hpsCityChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Property crime', 'Violent crime'],
+        datasets: [
+          { label: '2024', data: [19047, 7150], backgroundColor: '#94a3b8' },
+          { label: '2025', data: [17513, 7822], backgroundColor: '#4338ca' }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById('hpsSuburbChart'), {
+      type: 'bar',
+      data: {
+        labels: ['W11 Glanbrook', 'W12 Ancaster', 'W13 Dundas', 'W14 W. Mtn', 'W15 Waterdown'],
+        datasets: [
+          { label: 'Property 2025', data: [452, 1102, 534, 550, 522], backgroundColor: '#818cf8' },
+          { label: 'Violent 2025', data: [129, 196, 160, 316, 132], backgroundColor: '#4338ca' }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
   </script>
 </body>
 </html>
